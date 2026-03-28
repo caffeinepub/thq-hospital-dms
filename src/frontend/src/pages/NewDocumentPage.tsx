@@ -16,6 +16,7 @@ import type { DMSDocument, DocumentTable, Page } from "../types/dms";
 import {
   generateDocId,
   generateDocNumber,
+  generateDocNumberForDept,
   incrementDocCounter,
 } from "../utils/dmsStorage";
 
@@ -51,6 +52,7 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
     users,
     departments,
     templates,
+    docTypes,
   } = useDMS();
   const [loading, setLoading] = useState(false);
   const isSuperAdmin = currentUser?.role === "SuperAdmin";
@@ -58,7 +60,7 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
   // Simple form state (non-SA)
   const [simpleForm, setSimpleForm] = useState({
     title: "",
-    docType: "Letter" as DMSDocument["docType"],
+    docType: "Letter",
     department: "",
     assignedTo: "",
     priority: "Medium" as DMSDocument["priority"],
@@ -69,7 +71,7 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
   const [saForm, setSaForm] = useState({
     docNumber: generateDocNumber(),
     date: new Date().toISOString().split("T")[0],
-    docType: "Letter" as DMSDocument["docType"],
+    docType: "Letter",
     department: "",
     assignedTo: "",
     priority: "Medium" as DMSDocument["priority"],
@@ -371,9 +373,9 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
                 onChange={(e) => setSimple("docType", e.target.value)}
                 className={INPUT_CLS}
               >
-                {["Letter", "Memo", "Report", "Notice"].map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {docTypes.map((dt) => (
+                  <option key={dt.id} value={dt.name}>
+                    {dt.name}
                   </option>
                 ))}
               </select>
@@ -405,6 +407,10 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
                 onChange={(e) => {
                   setSimple("department", e.target.value);
                   setSimple("assignedTo", "");
+                  const selectedDept = departments.find(
+                    (d) => d.name === e.target.value,
+                  );
+                  setSa("docNumber", generateDocNumberForDept(selectedDept));
                 }}
                 className={INPUT_CLS}
               >
@@ -580,9 +586,9 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
               onChange={(e) => setSa("docType", e.target.value)}
               className={INPUT_CLS}
             >
-              {["Letter", "Memo", "Report", "Notice"].map((t) => (
-                <option key={t} value={t}>
-                  {t}
+              {docTypes.map((dt) => (
+                <option key={dt.id} value={dt.name}>
+                  {dt.name}
                 </option>
               ))}
             </select>
@@ -618,6 +624,10 @@ export default function NewDocumentPage({ onNavigate }: NewDocumentPageProps) {
               onChange={(e) => {
                 setSa("department", e.target.value);
                 setSa("assignedTo", "");
+                const selectedDept = departments.find(
+                  (d) => d.name === e.target.value,
+                );
+                setSa("docNumber", generateDocNumberForDept(selectedDept));
               }}
               className={INPUT_CLS}
             >

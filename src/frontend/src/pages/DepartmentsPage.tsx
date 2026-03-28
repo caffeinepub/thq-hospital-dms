@@ -18,7 +18,13 @@ export default function DepartmentsPage() {
   } = useDMS();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Department | null>(null);
-  const [form, setForm] = useState({ name: "", hodId: "", description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    hodId: "",
+    description: "",
+    logo: "",
+    numberFormat: "",
+  });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const hodUsers = users.filter(
@@ -27,7 +33,13 @@ export default function DepartmentsPage() {
 
   function openAdd() {
     setEditing(null);
-    setForm({ name: "", hodId: "", description: "" });
+    setForm({
+      name: "",
+      hodId: "",
+      description: "",
+      logo: "",
+      numberFormat: "",
+    });
     setShowModal(true);
   }
 
@@ -37,8 +49,20 @@ export default function DepartmentsPage() {
       name: dept.name,
       hodId: dept.hodId,
       description: dept.description,
+      logo: dept.logo ?? "",
+      numberFormat: dept.numberFormat ?? "",
     });
     setShowModal(true);
+  }
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setForm((p) => ({ ...p, logo: ev.target?.result as string }));
+    };
+    reader.readAsDataURL(file);
   }
 
   function handleSave() {
@@ -52,6 +76,8 @@ export default function DepartmentsPage() {
         name: form.name.trim(),
         hodId: form.hodId,
         description: form.description.trim(),
+        logo: form.logo || undefined,
+        numberFormat: form.numberFormat.trim() || undefined,
       });
       toast.success("Department updated");
       logActivity({
@@ -67,6 +93,8 @@ export default function DepartmentsPage() {
         hodId: form.hodId,
         description: form.description.trim(),
         createdAt: new Date().toISOString(),
+        logo: form.logo || undefined,
+        numberFormat: form.numberFormat.trim() || undefined,
       };
       addDepartment(dept);
       toast.success("Department created");
@@ -121,16 +149,21 @@ export default function DepartmentsPage() {
         <table className="w-full" data-ocid="departments.table">
           <thead>
             <tr className="border-b border-border">
-              {["Department", "Description", "HOD", "Created", "Actions"].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="px-5 py-3 text-left text-xs font-semibold text-muted-foreground"
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+              {[
+                "Department",
+                "Description",
+                "HOD",
+                "Doc Format",
+                "Created",
+                "Actions",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-5 py-3 text-left text-xs font-semibold text-muted-foreground"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -144,9 +177,17 @@ export default function DepartmentsPage() {
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-primary/10">
-                        <Building2 size={14} className="text-primary" />
-                      </div>
+                      {dept.logo ? (
+                        <img
+                          src={dept.logo}
+                          alt={dept.name}
+                          className="w-6 h-6 rounded object-contain"
+                        />
+                      ) : (
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                          <Building2 size={14} className="text-primary" />
+                        </div>
+                      )}
                       <span className="text-sm font-semibold text-foreground">
                         {dept.name}
                       </span>
@@ -159,6 +200,15 @@ export default function DepartmentsPage() {
                   </td>
                   <td className="px-5 py-4 text-xs text-foreground">
                     {hod?.name ?? "Not assigned"}
+                  </td>
+                  <td className="px-5 py-4 text-xs text-muted-foreground max-w-[140px]">
+                    {dept.numberFormat ? (
+                      <code className="text-primary/80 text-[10px] bg-primary/10 px-1.5 py-0.5 rounded">
+                        {dept.numberFormat}
+                      </code>
+                    ) : (
+                      <span className="text-muted-foreground/50">Default</span>
+                    )}
                   </td>
                   <td className="px-5 py-4 text-xs text-muted-foreground">
                     {new Date(dept.createdAt).toLocaleDateString("en-PK", {
@@ -208,11 +258,11 @@ export default function DepartmentsPage() {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="glass-card p-6 w-full max-w-md"
+            className="glass-card p-6 w-full max-w-md my-4"
             data-ocid="departments.dialog"
           >
             <div className="flex items-center justify-between mb-5">
@@ -280,6 +330,69 @@ export default function DepartmentsPage() {
                   rows={3}
                   className="w-full px-4 py-3 text-sm bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none"
                 />
+              </div>
+
+              {/* Department Logo */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground block mb-1.5">
+                  Department Logo
+                </p>
+                <div className="flex items-center gap-3">
+                  {form.logo && (
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={form.logo}
+                        alt="logo preview"
+                        className="w-8 h-8 rounded-lg object-contain border border-border bg-muted"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm((p) => ({ ...p, logo: "" }))}
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
+                        aria-label="Remove logo"
+                      >
+                        <X size={9} />
+                      </button>
+                    </div>
+                  )}
+                  <label
+                    data-ocid="departments.logo.upload_button"
+                    className="flex-1 flex items-center gap-2 px-3 py-2.5 text-xs bg-muted border border-dashed border-border rounded-xl text-muted-foreground hover:border-primary/50 hover:text-primary cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoChange}
+                    />
+                    {form.logo
+                      ? "Replace logo image"
+                      : "Upload logo image (PNG/JPG)"}
+                  </label>
+                </div>
+              </div>
+
+              {/* Document Number Format */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground block mb-1.5">
+                  Document Number Format
+                </p>
+                <input
+                  data-ocid="departments.number_format.input"
+                  type="text"
+                  value={form.numberFormat}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, numberFormat: e.target.value }))
+                  }
+                  placeholder="No.___{SEQ}___THQ-SlW."
+                  className="w-full px-4 py-2.5 text-sm bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 font-mono"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">
+                  Use <code className="text-primary">{"{SEQ}"}</code> for
+                  sequence number,{" "}
+                  <code className="text-primary">{"{YEAR}"}</code> for year.{" "}
+                  Leave blank to use default format.
+                </p>
               </div>
             </div>
             <div className="flex gap-3 mt-5">

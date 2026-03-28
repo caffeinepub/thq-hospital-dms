@@ -502,7 +502,7 @@ export default function DocumentDetailPage({
           background: "white",
           color: "black",
           fontFamily: "Times New Roman, serif",
-          padding: "30px 40px",
+          padding: "40px 50px",
           position: "relative",
           minHeight: "297mm",
         }}
@@ -527,23 +527,42 @@ export default function DocumentDetailPage({
         `}</style>
 
         {/* Watermark */}
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%) rotate(-45deg)",
-            fontSize: "72px",
-            opacity: 0.04,
-            fontWeight: "bold",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
-            color: "black",
-            userSelect: "none",
-          }}
-        >
-          THQ HOSPITAL SILLANWALI
-        </div>
+        {settings.watermarkUrl ? (
+          <img
+            src={settings.watermarkUrl}
+            alt=""
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%) rotate(-45deg)",
+              width: "400px",
+              height: "400px",
+              objectFit: "contain",
+              opacity: 0.08,
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%) rotate(-45deg)",
+              fontSize: "72px",
+              opacity: 0.04,
+              fontWeight: "bold",
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+              color: "black",
+              userSelect: "none",
+            }}
+          >
+            THQ HOSPITAL SILLANWALI
+          </div>
+        )}
 
         {/* Header */}
         <div style={{ overflow: "hidden", marginBottom: "0" }}>
@@ -613,22 +632,26 @@ export default function DocumentDetailPage({
           <div style={{ clear: "both" }} />
         </div>
 
-        <hr
+        {/* Double rule under header — official government format */}
+        <div
           style={{
-            border: "none",
-            borderTop: "2px solid black",
+            borderTop: "3px solid black",
+            borderBottom: "1px solid black",
             margin: "10px 0 14px",
+            paddingTop: "2px",
           }}
         />
 
-        {/* No & Date + QR Code */}
+        {/* No & Date — full width, no QR here */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
             fontSize: "13px",
-            marginBottom: "16px",
+            marginBottom: "20px",
+            borderBottom: "1px solid #ddd",
+            paddingBottom: "10px",
           }}
         >
           <div>
@@ -639,24 +662,17 @@ export default function DocumentDetailPage({
               <strong>DATED:</strong> {formatDatePrint(doc.createdAt)}
             </p>
           </div>
-          <img
-            src={qrUrl}
-            alt="QR Code"
-            style={{ width: "80px", height: "80px" }}
-          />
         </div>
 
-        {/* To */}
+        {/* To — tight spacing, no lines between name/designation */}
         {(doc.toName || doc.toDesignation || doc.toOrganization) && (
           <div style={{ marginBottom: "16px", fontSize: "13px" }}>
-            <p style={{ margin: "0 0 2px" }}>To,</p>
+            <p style={{ margin: 0 }}>To,</p>
             {doc.toName && (
-              <p style={{ margin: "0 0 2px", paddingLeft: "40px" }}>
-                {doc.toName}
-              </p>
+              <p style={{ margin: 0, paddingLeft: "40px" }}>{doc.toName}</p>
             )}
             {doc.toDesignation && (
-              <p style={{ margin: "0 0 2px", paddingLeft: "40px" }}>
+              <p style={{ margin: 0, paddingLeft: "40px" }}>
                 ({doc.toDesignation})
               </p>
             )}
@@ -694,7 +710,7 @@ export default function DocumentDetailPage({
               dangerouslySetInnerHTML={{ __html: doc.richContent }}
               style={{
                 fontSize: "13px",
-                lineHeight: "1.8",
+                lineHeight: "2",
                 textAlign: "justify",
                 textIndent: "40px",
               }}
@@ -706,7 +722,7 @@ export default function DocumentDetailPage({
                 key={`print-para-${doc.id}-${idx}`}
                 style={{
                   fontSize: "13px",
-                  lineHeight: "1.8",
+                  lineHeight: "2",
                   textAlign: "justify",
                   textIndent: "40px",
                   margin: "0 0 16px",
@@ -775,40 +791,6 @@ export default function DocumentDetailPage({
           </div>
         )}
 
-        {/* Signature */}
-        <div style={{ overflow: "hidden", marginBottom: "60px" }}>
-          <div style={{ float: "right", textAlign: "center" }}>
-            <div
-              style={{
-                borderTop: "1px solid black",
-                width: "150px",
-                marginBottom: "6px",
-              }}
-            />
-            <p
-              style={{
-                fontSize: "12px",
-                fontWeight: "bold",
-                margin: 0,
-                lineHeight: 1.4,
-              }}
-            >
-              MEDICAL SUPERINTENDENT
-            </p>
-            <p
-              style={{
-                fontSize: "12px",
-                fontWeight: "bold",
-                margin: 0,
-                lineHeight: 1.4,
-              }}
-            >
-              THQ HOSPITAL SILLANWALI
-            </p>
-          </div>
-          <div style={{ clear: "both" }} />
-        </div>
-
         {/* CC section */}
         {ccItems.length > 0 && (
           <div style={{ marginTop: "20px" }}>
@@ -839,51 +821,79 @@ export default function DocumentDetailPage({
           </div>
         )}
 
-        {/* Footer */}
-        <div style={{ textAlign: "right", marginTop: "40px" }}>
-          {settings.msSignature && (
+        {/* Footer — QR code left, signature right */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginTop: "40px",
+          }}
+        >
+          {/* QR Code — bottom left */}
+          <div style={{ textAlign: "center" }}>
             <img
-              src={settings.msSignature}
-              alt="MS Signature"
+              src={qrUrl}
+              alt="QR Code"
               style={{
-                maxWidth: "120px",
-                maxHeight: "60px",
-                marginLeft: "auto",
+                width: "80px",
+                height: "80px",
                 display: "block",
                 marginBottom: "4px",
               }}
             />
-          )}
-          <div
-            style={{
-              borderTop: "1px solid #333",
-              paddingTop: "6px",
-              display: "inline-block",
-              minWidth: "180px",
-            }}
-          />
-          <p
-            style={{
-              fontSize: "13px",
-              fontWeight: "bold",
-              margin: 0,
-              lineHeight: 1.4,
-            }}
-          >
-            {(settings.msName ?? "MEDICAL SUPERINTENDENT").toUpperCase()}
-          </p>
-          <p
-            style={{
-              fontSize: "13px",
-              fontWeight: "bold",
-              margin: 0,
-              lineHeight: 1.4,
-            }}
-          >
-            {(
-              settings.msDesignation ?? "THQ HOSPITAL SILLANWALI"
-            ).toUpperCase()}
-          </p>
+            <p style={{ fontSize: "9px", margin: 0, color: "#555" }}>
+              Scan to verify
+            </p>
+          </div>
+
+          {/* Signature — bottom right */}
+          <div style={{ textAlign: "center" }}>
+            {settings.msSignature && (
+              <img
+                src={settings.msSignature}
+                alt="MS Signature"
+                style={{
+                  maxWidth: "120px",
+                  maxHeight: "60px",
+                  display: "block",
+                  marginBottom: "4px",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              />
+            )}
+            <div
+              style={{
+                borderTop: "1px solid #333",
+                paddingTop: "4px",
+                minWidth: "180px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "bold",
+                  margin: 0,
+                  lineHeight: 1.4,
+                }}
+              >
+                {(settings.msName ?? "MEDICAL SUPERINTENDENT").toUpperCase()}
+              </p>
+              <p
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "bold",
+                  margin: 0,
+                  lineHeight: 1.4,
+                }}
+              >
+                {(
+                  settings.msDesignation ?? "THQ HOSPITAL SILLANWALI"
+                ).toUpperCase()}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

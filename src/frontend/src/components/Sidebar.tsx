@@ -79,14 +79,14 @@ export default function Sidebar({
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-border">
-        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-primary/30">
+        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-primary/30 bg-white p-1">
           <img
             src={
               settings.logoUrl ||
               "/assets/generated/thq-hospital-logo-transparent.dim_200x200.png"
             }
             alt="Hospital Logo"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
         <div>

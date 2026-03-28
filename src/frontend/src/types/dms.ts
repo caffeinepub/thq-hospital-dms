@@ -16,6 +16,17 @@ export interface Department {
   hodId: string;
   description: string;
   createdAt: string;
+  logo?: string; // base64 data URL
+  numberFormat?: string; // e.g. "No.___{SEQ}___OPD." or "OPD-{YEAR}-{SEQ}"
+}
+
+export interface DocumentType {
+  id: string;
+  name: string;
+  code: string; // abbreviation, e.g. "LTR"
+  description?: string;
+  numberFormat?: string; // optional per-type override, e.g. "No.___{SEQ}___LTR."
+  createdAt: string;
 }
 
 export interface DocumentTable {
@@ -26,7 +37,7 @@ export interface DocumentTable {
 export interface DMSDocument {
   id: string;
   title: string;
-  docType: "Letter" | "Memo" | "Report" | "Notice";
+  docType: string;
   department: string;
   createdBy: string;
   assignedTo: string;
@@ -53,7 +64,7 @@ export interface DMSDocument {
 export interface DocumentTemplate {
   id: string;
   name: string;
-  docType: "Letter" | "Memo" | "Report" | "Notice";
+  docType: string;
   subject: string;
   bodyParagraphs: string[];
   ccList: string[];
@@ -89,6 +100,7 @@ export interface HospitalSettings {
   msSignature?: string;
   msName?: string;
   msDesignation?: string;
+  watermarkUrl?: string;
 }
 
 export type Page =

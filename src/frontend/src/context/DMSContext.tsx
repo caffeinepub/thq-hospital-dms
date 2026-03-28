@@ -13,6 +13,7 @@ import type {
   DMSUser,
   Department,
   DocumentTemplate,
+  DocumentType,
   HospitalSettings,
 } from "../types/dms";
 import { generateId, initSeedData, storage } from "../utils/dmsStorage";
@@ -27,6 +28,7 @@ interface DMSContextType {
   activityLogs: ActivityLog[];
   settings: HospitalSettings;
   templates: DocumentTemplate[];
+  docTypes: DocumentType[];
   unreadCount: number;
   // User operations
   addUser: (user: DMSUser) => void;
@@ -49,6 +51,10 @@ interface DMSContextType {
   addTemplate: (template: DocumentTemplate) => void;
   updateTemplate: (id: string, updates: Partial<DocumentTemplate>) => void;
   deleteTemplate: (id: string) => void;
+  // Document type operations
+  addDocType: (dt: DocumentType) => void;
+  updateDocType: (id: string, updates: Partial<DocumentType>) => void;
+  deleteDocType: (id: string) => void;
 }
 
 const DMSContext = createContext<DMSContextType | undefined>(undefined);
@@ -75,6 +81,7 @@ export function DMSProvider({ principal, children }: DMSProviderProps) {
     storage.getSettings(),
   );
   const [templates, setTemplates] = useState<DocumentTemplate[]>([]);
+  const [docTypes, setDocTypes] = useState<DocumentType[]>([]);
 
   useEffect(() => {
     initSeedData();
@@ -85,6 +92,45 @@ export function DMSProvider({ principal, children }: DMSProviderProps) {
     setActivityLogs(storage.getActivityLogs());
     setSettingsState(storage.getSettings());
     setTemplates(storage.getTemplates());
+
+    const existingTypes = storage.getDocTypes();
+    if (existingTypes.length === 0) {
+      const defaults: DocumentType[] = [
+        {
+          id: "dt1",
+          name: "Letter",
+          code: "LTR",
+          description: "Official correspondence letters",
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: "dt2",
+          name: "Memo",
+          code: "MEMO",
+          description: "Internal memorandums",
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: "dt3",
+          name: "Report",
+          code: "RPT",
+          description: "Official reports",
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: "dt4",
+          name: "Notice",
+          code: "NTC",
+          description: "Public or internal notices",
+          createdAt: new Date().toISOString(),
+        },
+      ];
+      storage.saveDocTypes(defaults);
+      setDocTypes(defaults);
+    } else {
+      setDocTypes(existingTypes);
+    }
+
     const user = storage.getUserByPrincipal(principal);
     if (user) setCurrentUserState(user);
   }, [principal]);
@@ -249,6 +295,35 @@ export function DMSProvider({ principal, children }: DMSProviderProps) {
     });
   }, []);
 
+  const addDocType = useCallback((dt: DocumentType) => {
+    setDocTypes((prev) => {
+      const updated = [...prev, dt];
+      storage.saveDocTypes(updated);
+      return updated;
+    });
+  }, []);
+
+  const updateDocType = useCallback(
+    (id: string, updates: Partial<DocumentType>) => {
+      setDocTypes((prev) => {
+        const updated = prev.map((dt) =>
+          dt.id === id ? { ...dt, ...updates } : dt,
+        );
+        storage.saveDocTypes(updated);
+        return updated;
+      });
+    },
+    [],
+  );
+
+  const deleteDocType = useCallback((id: string) => {
+    setDocTypes((prev) => {
+      const updated = prev.filter((dt) => dt.id !== id);
+      storage.saveDocTypes(updated);
+      return updated;
+    });
+  }, []);
+
   const unreadCount = notifications.filter(
     (n) => n.userId === currentUser?.id && !n.isRead,
   ).length;
@@ -265,6 +340,7 @@ export function DMSProvider({ principal, children }: DMSProviderProps) {
         activityLogs,
         settings,
         templates,
+        docTypes,
         unreadCount,
         addUser,
         updateUser,
@@ -280,6 +356,9 @@ export function DMSProvider({ principal, children }: DMSProviderProps) {
         addTemplate,
         updateTemplate,
         deleteTemplate,
+        addDocType,
+        updateDocType,
+        deleteDocType,
       }}
     >
       {children}

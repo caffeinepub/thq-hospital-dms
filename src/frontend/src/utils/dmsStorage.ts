@@ -5,6 +5,7 @@ import type {
   DMSUser,
   Department,
   DocumentTemplate,
+  DocumentType,
   HospitalSettings,
 } from "../types/dms";
 
@@ -18,6 +19,7 @@ const KEYS = {
   SEEDED: "dms_seeded",
   PENDING_SA: "dms_pending_super_admin",
   TEMPLATES: "dms_templates",
+  DOC_TYPES: "dms_doc_types",
 };
 
 function getItem<T>(key: string, fallback: T): T {
@@ -77,6 +79,9 @@ export const storage = {
     getItem<DocumentTemplate[]>(KEYS.TEMPLATES, []),
   saveTemplates: (templates: DocumentTemplate[]): void =>
     setItem(KEYS.TEMPLATES, templates),
+  getDocTypes: (): DocumentType[] =>
+    getItem<DocumentType[]>(KEYS.DOC_TYPES, []),
+  saveDocTypes: (types: DocumentType[]): void => setItem(KEYS.DOC_TYPES, types),
 };
 
 export function generateId(prefix: string): string {
@@ -110,6 +115,29 @@ export function generateDocNumber(): string {
     // ignore
   }
   return `No.___${String(counter.seq).padStart(3, "0")}___THQ-SlW.`;
+}
+
+export function generateDocNumberForDept(dept?: Department): string {
+  if (!dept?.numberFormat) return generateDocNumber();
+
+  const currentYear = new Date().getFullYear();
+  let counter = { year: currentYear, seq: 1 };
+  try {
+    const stored = localStorage.getItem(DOC_COUNTER_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as { year: number; seq: number };
+      if (parsed.year === currentYear) {
+        counter = parsed;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  const seq = String(counter.seq).padStart(3, "0");
+  return dept.numberFormat
+    .replace(/{SEQ}/g, seq)
+    .replace(/{YEAR}/g, String(currentYear));
 }
 
 export function incrementDocCounter(): void {

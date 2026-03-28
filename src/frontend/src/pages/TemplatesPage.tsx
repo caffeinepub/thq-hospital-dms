@@ -43,17 +43,17 @@ function TemplateForm({
   initial,
   onSave,
   onCancel,
+  docTypes,
 }: {
   initial?: DocumentTemplate;
   onSave: (
     data: Omit<DocumentTemplate, "id" | "createdBy" | "createdAt">,
   ) => void;
   onCancel: () => void;
+  docTypes: import("../types/dms").DocumentType[];
 }) {
   const [name, setName] = useState(initial?.name ?? "");
-  const [docType, setDocType] = useState<DMSDocument["docType"]>(
-    initial?.docType ?? "Letter",
-  );
+  const [docType, setDocType] = useState<string>(initial?.docType ?? "Letter");
   const [subject, setSubject] = useState(initial?.subject ?? "");
   const [richContent, setRichContent] = useState(
     initial?.richContent ??
@@ -179,14 +179,12 @@ function TemplateForm({
           <select
             data-ocid="templates.type.select"
             value={docType}
-            onChange={(e) =>
-              setDocType(e.target.value as DMSDocument["docType"])
-            }
+            onChange={(e) => setDocType(e.target.value)}
             className={INPUT_CLS}
           >
-            {["Letter", "Memo", "Report", "Notice"].map((t) => (
-              <option key={t} value={t}>
-                {t}
+            {docTypes.map((dt) => (
+              <option key={dt.id} value={dt.name}>
+                {dt.name}
               </option>
             ))}
           </select>
@@ -429,6 +427,7 @@ export default function TemplatesPage() {
     updateTemplate,
     deleteTemplate,
     currentUser,
+    docTypes,
   } = useDMS();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -529,6 +528,7 @@ export default function TemplatesPage() {
               </button>
             </div>
             <TemplateForm
+              docTypes={docTypes}
               onSave={handleCreate}
               onCancel={() => setShowForm(false)}
             />
@@ -584,6 +584,7 @@ export default function TemplatesPage() {
                     </button>
                   </div>
                   <TemplateForm
+                    docTypes={docTypes}
                     initial={tpl}
                     onSave={(data) => handleUpdate(tpl.id, data)}
                     onCancel={() => setEditingId(null)}
