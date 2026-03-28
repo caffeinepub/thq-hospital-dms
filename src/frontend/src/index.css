@@ -1,0 +1,186 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+    --background: 0.08 0.007 168;
+    --foreground: 0.93 0.018 168;
+    --card: 0.14 0.008 168;
+    --card-foreground: 0.93 0.018 168;
+    --popover: 0.12 0.008 168;
+    --popover-foreground: 0.93 0.018 168;
+    --primary: 0.87 0.198 163;
+    --primary-foreground: 0.24 0.066 163;
+    --secondary: 0.16 0.008 168;
+    --secondary-foreground: 0.93 0.018 168;
+    --muted: 0.14 0.008 168;
+    --muted-foreground: 0.65 0.018 168;
+    --accent: 0.2 0.02 163;
+    --accent-foreground: 0.87 0.198 163;
+    --destructive: 0.63 0.24 27;
+    --destructive-foreground: 0.93 0.018 168;
+    --border: 1 0 0 / 8%;
+    --input: 1 0 0 / 10%;
+    --ring: 0.87 0.198 163;
+    --chart-1: 0.87 0.198 163;
+    --chart-2: 0.7 0.16 200;
+    --chart-3: 0.75 0.14 250;
+    --chart-4: 0.8 0.18 100;
+    --chart-5: 0.63 0.24 27;
+    --sidebar: 0.1 0.008 168;
+    --sidebar-foreground: 0.93 0.018 168;
+    --sidebar-primary: 0.87 0.198 163;
+    --sidebar-primary-foreground: 0.24 0.066 163;
+    --sidebar-accent: 0.18 0.015 163;
+    --sidebar-accent-foreground: 0.87 0.198 163;
+    --sidebar-border: 1 0 0 / 8%;
+    --sidebar-ring: 0.87 0.198 163;
+  }
+
+  .dark {
+    --background: 0.08 0.007 168;
+    --foreground: 0.93 0.018 168;
+    --card: 0.14 0.008 168;
+    --card-foreground: 0.93 0.018 168;
+    --popover: 0.12 0.008 168;
+    --popover-foreground: 0.93 0.018 168;
+    --primary: 0.87 0.198 163;
+    --primary-foreground: 0.24 0.066 163;
+    --secondary: 0.16 0.008 168;
+    --secondary-foreground: 0.93 0.018 168;
+    --muted: 0.14 0.008 168;
+    --muted-foreground: 0.65 0.018 168;
+    --accent: 0.2 0.02 163;
+    --accent-foreground: 0.87 0.198 163;
+    --destructive: 0.63 0.24 27;
+    --destructive-foreground: 0.93 0.018 168;
+    --border: 1 0 0 / 8%;
+    --input: 1 0 0 / 10%;
+    --ring: 0.87 0.198 163;
+    --chart-1: 0.87 0.198 163;
+    --chart-2: 0.7 0.16 200;
+    --chart-3: 0.75 0.14 250;
+    --chart-4: 0.8 0.18 100;
+    --chart-5: 0.63 0.24 27;
+    --sidebar: 0.1 0.008 168;
+    --sidebar-foreground: 0.93 0.018 168;
+    --sidebar-primary: 0.87 0.198 163;
+    --sidebar-primary-foreground: 0.24 0.066 163;
+    --sidebar-accent: 0.18 0.015 163;
+    --sidebar-accent-foreground: 0.87 0.198 163;
+    --sidebar-border: 1 0 0 / 8%;
+    --sidebar-ring: 0.87 0.198 163;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: oklch(var(--card));
+    border: 1px solid oklch(var(--border));
+    border-radius: 1.25rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0
+      rgba(255, 255, 255, 0.06);
+  }
+
+  .mint-badge {
+    background: oklch(0.87 0.198 163 / 0.15);
+    color: oklch(0.87 0.198 163);
+    border: 1px solid oklch(0.87 0.198 163 / 0.3);
+  }
+
+  .sidebar-nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200;
+    color: oklch(0.65 0.018 168);
+  }
+
+  .sidebar-nav-item:hover {
+    background: oklch(0.18 0.015 163);
+    color: oklch(0.93 0.018 168);
+  }
+
+  .sidebar-nav-item.active {
+    background: oklch(0.87 0.198 163 / 0.12);
+    color: oklch(0.87 0.198 163);
+    box-shadow: 0 0 0 1px oklch(0.87 0.198 163 / 0.2);
+  }
+}
+
+/* Status badge colors */
+.status-approved {
+  @apply bg-emerald-500/15 text-emerald-400 border border-emerald-500/30;
+}
+.status-pending {
+  @apply bg-amber-500/15 text-amber-400 border border-amber-500/30;
+}
+.status-draft {
+  @apply bg-zinc-500/15 text-zinc-400 border border-zinc-500/30;
+}
+.status-rejected {
+  @apply bg-red-500/15 text-red-400 border border-red-500/30;
+}
+.status-assigned {
+  @apply bg-blue-500/15 text-blue-400 border border-blue-500/30;
+}
+
+/* Priority badge colors */
+.priority-high {
+  @apply bg-red-500/15 text-red-400 border border-red-500/30;
+}
+.priority-medium {
+  @apply bg-amber-500/15 text-amber-400 border border-amber-500/30;
+}
+.priority-low {
+  @apply bg-zinc-500/15 text-zinc-400 border border-zinc-500/30;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    font-family: "Times New Roman", serif !important;
+  }
+  .print-document {
+    page-break-inside: avoid;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(0.1 0.008 168);
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.22 0.01 168);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.87 0.198 163 / 0.5);
+}
